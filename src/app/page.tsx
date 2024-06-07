@@ -1,12 +1,15 @@
-import { Tree } from '~/app/components/Tree';
-import { api } from '~/trpc/server';
+'use client';
 
-export default async function Home() {
-  const { treeData } = await api.post.getAll();
+import { Tree } from '~/app/components/Tree';
+import { api } from '~/trpc/react';
+
+export default function Home() {
+  const { data, isLoading } = api.node.getAll.useQuery();
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#441d7a] to-[#15162c] text-white">
-      <Tree treeData={treeData} />
+    <main>
+      {isLoading && 'Loading...'}
+      {data && <Tree treeData={data} />}
     </main>
   );
 }
