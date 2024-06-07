@@ -1,15 +1,37 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { type Node } from '~/app/types';
+import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+const treeData: Node = {
+  id: 'root',
+  text: 'Root Node',
+  children: [
+    { id: 'node1', text: 'Child 1' },
+    {
+      id: 'node2',
+      text: 'Child 2',
+      children: [
+        {
+          id: 'node3',
+          text: 'Grandchild 1',
+          children: [
+            {
+              id: 'node4',
+              text: 'Great Grandchild 1',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
 
-export const postRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
+export const nodeRouter = createTRPCRouter({
+  getAll: publicProcedure.query(() => {
+    return {
+      treeData,
+    };
+  }),
 
   create: publicProcedure
     .input(z.object({ name: z.string().min(1) }))
@@ -26,7 +48,7 @@ export const postRouter = createTRPCRouter({
 
   getLatest: publicProcedure.query(({ ctx }) => {
     return ctx.db.post.findFirst({
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
   }),
 });
